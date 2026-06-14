@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="InstrumentsStore.App/InstrumentsStore.App.csproj" />
+  <Project Path="InstrumentsStore.Domain/InstrumentsStore.Domain.csproj" />
+</Solution>
