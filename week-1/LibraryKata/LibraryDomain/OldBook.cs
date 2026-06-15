@@ -9,7 +9,7 @@ public class OldBook
     public string? Author{get; private set;}
     public int? CopiesAvailable {get; private set;}
 
-    // The same way ew can have static methods (belong to the class)
+    // The same way we can have static methods (belong to the class)
     // we can have static properties/members
     private static int _nextId = 1; // By convention, static properties have an underscore
 
