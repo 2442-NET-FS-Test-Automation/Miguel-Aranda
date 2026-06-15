@@ -31,7 +31,7 @@ public class Sshop : ISshop
             Console.WriteLine($"[{item.Id}] {item.ListItems()} -> Stock: {item.Quantity}");
         }
 
-        Console.WriteLine("Choose an item to buy (numbers only)");
+        Console.WriteLine($"Choose an item to buy (numbers only)");
         int id = int.Parse(Console.ReadLine());
 
         // choose element by id
@@ -59,8 +59,10 @@ public class Sshop : ISshop
 
     }
 
-    public void Sell()
-    {
-        Console.WriteLine("\n-====- SELL -====-\n What items would you like to sell?");
-    }
+
+    // there once was this method idea about to be implemented but the lazyness controlled me
+    // public void Sell()
+    // {
+    //     Console.WriteLine("\n-====- SELL -====-\n What items would you like to sell?");
+    // }
 }

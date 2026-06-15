@@ -14,7 +14,7 @@ public class Guitar : InstrumentItem, IinstrumentActions
 
     public override string ListItems()
     {
-        return $"Guitar: {Name}, Brand: {Brand}, Price: ${Price}, Strings: {NumStrings}, Is Acoustic?: {IsAcoustic}";
+        return $"[{Id}] Guitar: {Name}, Brand: {Brand}, Price: ${Price}, Strings: {NumStrings}, Is Acoustic?: {IsAcoustic}";
     }
 
     public string Play()

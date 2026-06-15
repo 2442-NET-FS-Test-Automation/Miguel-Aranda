@@ -14,11 +14,11 @@ public class Piano : InstrumentItem, IinstrumentActions
 
     public override string ListItems()
     {
-        return $"Bsttery: {Name}, Brand: {Brand}, Price: ${Price}, Keys: {NumKeys}, Is digital? {IsDigital}";
+        return $"[{Id}] Piano: {Name}, Brand: {Brand}, Price: ${Price}, Keys: {NumKeys}, Is digital? {IsDigital}";
     }
 
     public string Play()
     {
-        return $"Playing {Name} piano";
+        return $"Playing {Name} Piano";
     }
 }

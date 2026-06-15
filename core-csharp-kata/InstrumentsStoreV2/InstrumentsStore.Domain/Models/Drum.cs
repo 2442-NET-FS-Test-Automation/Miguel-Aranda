@@ -14,11 +14,11 @@ public class Drum : InstrumentItem, IinstrumentActions
 
     public override string ListItems()
     {
-        return $"Battery: {Name}, Brand: {Brand}, Price: ${Price}, Drums: {NumDrums}, Has cymbals? {HasCymbals}";
+        return $"Drum: [{Id}] {Name}, Brand: {Brand}, Price: ${Price}, Drums: {NumDrums}, Has cymbals? {HasCymbals}";
     }
 
     public string Play()
     {
-        return $"Playing {Name} battery!";
+        return $"Playing {Name} Drum!";
     }
 }
