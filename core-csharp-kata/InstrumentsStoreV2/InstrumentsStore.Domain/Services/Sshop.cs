@@ -1,4 +1,5 @@
 using System.Diagnostics.Metrics;
+using System.Numerics;
 
 namespace InstrumentsStore;
 
@@ -28,7 +29,7 @@ public class Sshop : ISshop
         Console.WriteLine("\n-====- Available items -====-");
         foreach(var item in Inventory)
         {
-            Console.WriteLine($"[{item.Id}] {item.ListItems()} -> Stock: {item.Quantity}");
+            Console.WriteLine($"{item.ListItems()} -> Stock: {item.Quantity}");
         }
 
         Console.WriteLine($"Choose an item to buy (numbers only)");
@@ -40,13 +41,20 @@ public class Sshop : ISshop
         // If id can't be found | doesn't exist
         if(choosen == null)
         {
-            Console.WriteLine("Instrument cannot be found!");
+            Console.WriteLine("Instrument cannot be found!\n");
             return;
         }
 
         if(choosen.Quantity <= 0)
         {
-            Console.WriteLine("Item out of stock!");
+            Console.WriteLine("Item out of stock!\n");
+            return;
+        }
+
+        // If client doesn't have enought money won't be able to buy the product
+        if(Client.Balance < choosen.Price)
+        {
+            Console.WriteLine("You don't have enought money!\n");
             return;
         }
 
@@ -55,14 +63,45 @@ public class Sshop : ISshop
         // Add instrument bought to your list
         Client.MyInstrument.Add(choosen);
 
-        Console.WriteLine($"You bought: {choosen.Name}. Remaining stock: {choosen.Quantity}");
+        // Balance gets decreased
+        Client.Balance -= choosen.Price;
+
+        Console.WriteLine($"You bought: {choosen.Name}. You paid ${choosen.Price} \nRemaining stock: {choosen.Quantity}\n");
 
     }
 
+    // Method for client to sell instruments
+    public void Sell()
+    {
 
-    // there once was this method idea about to be implemented but the lazyness controlled me
-    // public void Sell()
-    // {
-    //     Console.WriteLine("\n-====- SELL -====-\n What items would you like to sell?");
-    // }
+        Console.WriteLine("-============- SELL -============-\n");
+
+        foreach(var item in Client.MyInstrument)
+        {
+            Console.WriteLine($"{item.ListItems()}\n");
+        }
+
+        if(Client.MyInstrument.Count == 0)
+        {
+            Console.WriteLine("You don't have any instruments to SELL!\n");
+            return;
+        }
+
+        Console.Write("What items would you like to sell\n");
+
+        int id = int.Parse(Console.ReadLine());
+        InstrumentItem choosen = Client.MyInstrument.FirstOrDefault(x => x.Id == id);
+
+        // Add it to the store's stock
+        choosen.Quantity++;
+        
+        // Sum instruments price once it is sold
+        decimal MoneyReceived = choosen.Price;
+        Client.Balance += choosen.Price;
+
+        // Once sold remove it from client's list
+        Client.MyInstrument.Remove(choosen);
+
+        Console.WriteLine($"You sold {choosen.Name}. You earned: {MoneyReceived} \n Remaining stock in store {choosen.Quantity} \n");
+    }
 }

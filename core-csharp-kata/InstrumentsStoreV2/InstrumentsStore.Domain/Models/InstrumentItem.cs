@@ -6,7 +6,7 @@ public abstract class InstrumentItem
     public int Id {get;}
     public string? Name {get; set;}
     public string? Brand {get; set;}
-    public decimal? Price {get; set;}
+    public decimal Price {get; set;}
     public int? Quantity {get; set;}
 
     private static int _nextId = 1; 

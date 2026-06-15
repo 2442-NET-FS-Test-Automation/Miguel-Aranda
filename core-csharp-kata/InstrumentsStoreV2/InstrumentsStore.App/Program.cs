@@ -13,6 +13,7 @@ public class Program
         Console.WriteLine("Option 2: LIST YOUR INSTRUMENTS");
         Console.WriteLine("Option 3: PLAY INSTRUMENT");
         Console.WriteLine("Option 4: CHECK BALANCE");
+        Console.WriteLine("Option 5: SELL INSTRUMENT");
         Console.WriteLine("Option 0: Exit program\n");
         Console.Write("please choose: ");
     }
@@ -88,6 +89,9 @@ public class Program
                     Console.WriteLine($"\nYour current balance: {client.Balance}");
                     break;
 
+                case 5:
+                    shop.Sell();
+                    break;
                 case 0:
                     Console.WriteLine($"\n Have a good day!\n");
                     start = false;

@@ -14,7 +14,7 @@ public class Drum : InstrumentItem, IinstrumentActions
 
     public override string ListItems()
     {
-        return $"Drum: [{Id}] {Name}, Brand: {Brand}, Price: ${Price}, Drums: {NumDrums}, Has cymbals? {HasCymbals}";
+        return $"[{Id}] Drum: {Name}, Brand: {Brand}, Price: ${Price}, Drums: {NumDrums}, Has cymbals? {HasCymbals}";
     }
 
     public string Play()
