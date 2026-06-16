@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LibraryAkata.App")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9809eb383d95e2c123aa2441b6785c3c6b388bdc")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+cc8ae400e494d7ed35bc416583fb31ac4be1cc0b")]
 [assembly: System.Reflection.AssemblyProductAttribute("LibraryAkata.App")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LibraryAkata.App")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
