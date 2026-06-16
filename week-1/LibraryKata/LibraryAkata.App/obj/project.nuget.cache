@@ -1,8 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "jTdETJsEhbo=",
+  "dgSpecHash": "P5/HDZ/Ve6A=",
   "success": true,
   "projectFilePath": "C:\\Users\\angie\\OneDrive\\Documentos\\codigo miguel\\Miguel-Aranda\\week-1\\LibraryKata\\LibraryAkata.App\\LibraryAkata.App.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "C:\\Users\\angie\\.nuget\\packages\\serilog\\4.3.1\\serilog.4.3.1.nupkg.sha512",
+    "C:\\Users\\angie\\.nuget\\packages\\serilog.sinks.console\\6.1.1\\serilog.sinks.console.6.1.1.nupkg.sha512"
+  ],
   "logs": []
 }
