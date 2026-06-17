@@ -1,5 +1,6 @@
 ﻿// If I had code from another namespace I want to use here - I use a using statement
 using LibraryDomain;
+using Serilog;
 
 namespace LibraryKata.App; // A namespace is like a bucket or logical container for different
 // related code files.
@@ -15,6 +16,15 @@ public class Program
     // void - it doesn't return anything
     public static void Main()
     {   
+        // Lests configure Serilog here before any code execution
+        // Serilog works via singleton object. Its share globally
+        // throughout the app, configure once use anywhere
+        Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Information() // Verbose > Debug > Info > Warning > Error > Faltal
+            .WriteTo.Console() // Sink: Where do my logs go? COnsole, text file, database, etc?
+            .CreateLogger(); // create the logger based on the config above
+
+
         // When I call dotnet run, it finds Main() and begins code execution at the first line of the 
         // main method. I wrote my code, inside DataTypesAndOperators() - a separate method. So if I want 
         // that code to run, I need to call it inside Main()
@@ -22,6 +32,12 @@ public class Program
         ClassesExample();
         OopDemo();
         CollectionsDemo();
+
+        // In case there are any lingering logs by the time we hit line 41 above
+        // Don't just stop execution, write the logs to their sink THEN close the program
+        Log.CloseAndFlush();
+        ExceptionsDemo();
+        AdvancedClassesDemo();
     }
 
     // private - accessible only within this class
@@ -253,5 +269,118 @@ public class Program
         Console.WriteLine($"Trying to add a third thing in our catalog: {shelf.TryAdd(catalog._items[2])}");
 
     }
+    public static void ExceptionsDemo()
+    {
+        Console.WriteLine("\n == Exceptions, patterns, logging ==");
+        
+        // By using Liskov Substitution from SOLID, if I later swap to
+        // a SQLibraryRepo or whatever, this is the only line I have to change
+        ILibraryRepository repo = new InMemoryLibraryRepository();
+
+        // Injecting our existing repo object to stadisfy LibraryUnitOfWork's dependency
+        IUnitOfWork libraryWork = new LibraryUnitOfWork(repo);
+
+        // Create a book, but using our factory 
+        LibraryItem dune = LibraryItemFactory.Create(ItemKind.Book, "Dune", "Frank Herbert", copies: 3);
+
+        repo.Add(dune);
+
+        repo.Add(LibraryItemFactory.Create(ItemKind.Magazine, "Wired", "Axel", copies: 2));
+
+        // Pretend we're comitting changes to a DB or something
+        libraryWork.Stage("added 2 items");
+        libraryWork.Commit();
+
+        // We went though the trouble of creating custom exceptions
+        // Lets actually see them work for us. If you have code taht can potentially fail
+        // wrap it in a try-catch (optional finally)
+        try
+        {
+            // Potentially offending code goes here 
+            LibraryItem missing = repo.GetById(99);
+            Console.WriteLine(missing.Describe()); // we won't hit this I believe
+        }
+        catch (ItemNotFoundException ex)
+        {
+            // Your code can potentially throw more than one error
+            // last to least
+            // We stored the offending id on the exception itself, here we can ask for it for logging
+            Log.Error("Lookup failed for id {Id}: {Message}", ex.Id, ex.Message);
+        }
+        catch (LibraryException ex)
+        {
+            Log.Error("Library error {Message}", ex.Message);
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Non libray error: {Message}", ex.Message);
+        }
+        finally // Optional, but addidg a fianlly block adds code that runs
+        { // whether an exception is catch or not
+            Console.WriteLine("hit out fianlly block - lookup attempt done");
+        }
+
+        Book noCopies = new Book("Count of Montecristo","John", 0);
+
+        try
+        {
+            Borrow(noCopies);
+        }
+        catch(ItemNotAvailableException ex)
+        {
+            Log.Warning("Borrow refused: {Message}", ex.Message);
+        }
+    }
+
+    public static void Borrow(Book book)
+    {
+            if (!book.CheckOut())
+            {
+                throw new ItemNotAvailableException(book.Title);
+            }
+     }
+
+     public static void AdvancedClassesDemo()
+    {
+        Console.WriteLine("\n == Advanced classes ==");
+        // First, a quick detour, lets interact with the GC
+        Console.WriteLine(GC.GetTotalMemory(forceFullCollection: false) / 1024);
+
+        ILibraryRepository repo = new InMemoryLibraryRepository();
+
+        // Create a book, but using our factory 
+        LibraryItem dune = LibraryItemFactory.Create(ItemKind.Book, "Dune", "Frank Herbert", copies: 3);
+
+        repo.Add(dune);
+
+        repo.Add(LibraryItemFactory.Create(ItemKind.Magazine, "Wired", "Axel", copies: 2));
+        repo.Add(LibraryItemFactory.Create(ItemKind.Book, "Dune Messiah", "Frank Herbert", copies: 3));
+        repo.Add(LibraryItemFactory.Create(ItemKind.ReferenceBook, "C# Language Reference", "Microsoft", 1, section: "Technology"));
+
+        Catalog catalog = new();
+
+        foreach (LibraryItem item in repo.GetAll())
+        {
+            catalog.Add(item);
+        }
+        Console.WriteLine($"We have {catalog.Authors.Count} unique authors in our catalog");
+        foreach(string author in catalog.Authors)
+        {
+            Console.WriteLine(author);
+        }
+        // Lets search our catalog now that it's locked by a dictionary
+        // Lets use our find() method
+        List<LibraryItem> byFrankHerbert = catalog.Find(item => item.Author == "Frank Herbert");
+        Console.WriteLine($"There are {byFrankHerbert.Count} books by Frank Herbert");
+
+        // Lets see how many items in the catalog are lendable
+        Console.WriteLine("We have a mix of lendable and non-lendable items");
+
+        foreach(LibraryItem item in catalog.Lendable())
+        {
+            Console.WriteLine($"{item.Title}");
+        }
+    }
 }
+
 

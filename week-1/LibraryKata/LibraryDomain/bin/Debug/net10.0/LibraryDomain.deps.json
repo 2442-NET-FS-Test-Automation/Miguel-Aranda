@@ -6,12 +6,13 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v10.0": {
-      "LibraryAkata.App/1.0.0": {
+      "LibraryDomain/1.0.0": {
         "dependencies": {
-          "LibraryDomain": "1.0.0"
+          "Serilog": "4.3.1",
+          "Serilog.Sinks.Console": "6.1.1"
         },
         "runtime": {
-          "LibraryAkata.App.dll": {}
+          "LibraryDomain.dll": {}
         }
       },
       "Serilog/4.3.1": {
@@ -32,23 +33,11 @@
             "fileVersion": "6.1.1.0"
           }
         }
-      },
-      "LibraryDomain/1.0.0": {
-        "dependencies": {
-          "Serilog": "4.3.1",
-          "Serilog.Sinks.Console": "6.1.1"
-        },
-        "runtime": {
-          "LibraryDomain.dll": {
-            "assemblyVersion": "1.0.0.0",
-            "fileVersion": "1.0.0.0"
-          }
-        }
       }
     }
   },
   "libraries": {
-    "LibraryAkata.App/1.0.0": {
+    "LibraryDomain/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
@@ -66,11 +55,6 @@
       "sha512": "sha512-8jbqgjUyZlfCuSTaJk6lOca465OndqOz3KZP6Cryt/IqZYybyBu7GP0fE/AXBzrrQB3EBmQntBFAvMVz1COvAA==",
       "path": "serilog.sinks.console/6.1.1",
       "hashPath": "serilog.sinks.console.6.1.1.nupkg.sha512"
-    },
-    "LibraryDomain/1.0.0": {
-      "type": "project",
-      "serviceable": false,
-      "sha512": ""
     }
   }
 }

@@ -17,3 +17,5 @@ C:\Users\angie\OneDrive\Documentos\codigo miguel\Miguel-Aranda\week-1\LibraryKat
 C:\Users\angie\OneDrive\Documentos\codigo miguel\Miguel-Aranda\week-1\LibraryKata\LibraryAkata.App\obj\Debug\net10.0\LibraryAkata.App.pdb
 C:\Users\angie\OneDrive\Documentos\codigo miguel\Miguel-Aranda\week-1\LibraryKata\LibraryAkata.App\obj\Debug\net10.0\LibraryAkata.App.genruntimeconfig.cache
 C:\Users\angie\OneDrive\Documentos\codigo miguel\Miguel-Aranda\week-1\LibraryKata\LibraryAkata.App\obj\Debug\net10.0\ref\LibraryAkata.App.dll
+C:\Users\angie\OneDrive\Documentos\codigo miguel\Miguel-Aranda\week-1\LibraryKata\LibraryAkata.App\bin\Debug\net10.0\Serilog.dll
+C:\Users\angie\OneDrive\Documentos\codigo miguel\Miguel-Aranda\week-1\LibraryKata\LibraryAkata.App\bin\Debug\net10.0\Serilog.Sinks.Console.dll

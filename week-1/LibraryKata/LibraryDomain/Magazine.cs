@@ -1,6 +1,8 @@
 namespace LibraryDomain;
 
-public class Magazine: LibraryItem, ILendable
+// Selead is pretty simple, it means this class is not inheritable
+// Nobody can be a child of Magazine
+public sealed class Magazine: LibraryItem, ILendable
 {
     public int CirculationCopies {get; private set;}
     public string Publisher{get; private set;}
