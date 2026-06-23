@@ -14,7 +14,7 @@ public class Program
     // public - accessible across the program
     // static - Main can be called upon without a Program object. It is a Static/class method. 
     // void - it doesn't return anything
-    public static void Main()
+    public static async Task Main()
     {   
         // Lests configure Serilog here before any code execution
         // Serilog works via singleton object. Its share globally
@@ -38,6 +38,7 @@ public class Program
         Log.CloseAndFlush();
         ExceptionsDemo();
         AdvancedClassesDemo();
+        await AsyncHttpDemo();
     }
 
     // private - accessible only within this class
@@ -380,6 +381,43 @@ public class Program
         {
             Console.WriteLine($"{item.Title}");
         }
+    }
+
+     public static async Task AsyncHttpDemo()
+    {
+        // We wrote our client object lets use it
+        OpenLibraryClient client = new();
+
+        // Array to hold some isbns
+        string[] isbns = { "9780132350884", "9780201633610"};
+
+        // I want to fetch data from OpenLibrary for BOTH isbns
+        Task<LibraryItem?>[] fetchedBooks = new Task<LibraryItem?>[isbns.Length];
+
+        // Next we loop throught the array and call FetchByIdAsync
+
+        for(int i=0; i<isbns.Length; i++)
+        {
+            fetchedBooks[i] = client.FetchByIsbnAsync(isbns[i]);
+        }
+
+        LibraryItem?[] foundBooks = await Task.WhenAll(fetchedBooks);
+
+        LibraryItem? firstBookFound = foundBooks.Length > 0 ? foundBooks[0] : null;
+
+
+        Console.WriteLine($"Fetched: {firstBookFound?.Describe() ?? "nothing"}");
+
+        // Boxing and unboxing - mostly depricated , replaced by Generics
+        // Sometimes we needed to store value types on the heap, think of adding an int to a list. Before generics (List<T>)
+        // we had an arraylist to accomplish the same thing. 
+
+        int toBeBoxed = 6;
+        // We "box" it, by giving wrapping it in an object reference
+
+        object boxed = toBeBoxed;
+
+        int unboxed =(int)boxed;
     }
 }
 
