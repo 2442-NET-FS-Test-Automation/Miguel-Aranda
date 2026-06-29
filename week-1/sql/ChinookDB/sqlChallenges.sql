@@ -135,30 +135,70 @@ INNER JOIN Employee as e ON e.EmployeeId = c.SupportRepId
 AND e.Title LIKE '%SALES%'
 GROUP BY e.EmployeeId;
 
--- Which track was purchased the most in 2010?
-SELECT * FROM Track;
-SELECT * FROM Play
-
+-- Which track was purchased the most in 2021?
+SELECT TOP 1 Name
+FROM Track as t
+INNER JOIN InvoiceLine as IL on IL.TrackId = t.TrackId
+INNER JOIN Invoice as I on I.InvoiceId = IL.InvoiceId
+AND I.InvoiceDate >= '2021-01-01' AND I.InvoiceDate < '2022-01-01'
+ORDER BY I.Total DESC;
 -- Show the top three best selling artists.
-
+SELECT TOP 3 ar.Name 
+FROM Artist as ar
+INNER JOIN Album as al on al.ArtistId = ar.ArtistId
+INNER JOIN Track as t on t.AlbumId = al.AlbumId
+INNER JOIN InvoiceLine as IL on Il.TrackId = t.TrackId
+INNER JOIN Invoice as I on I.InvoiceId = IL.InvoiceId
+GROUP BY ar.ArtistId, I.Total, ar.Name
+ORDER BY I.Total DESC;
 
 -- Which customers have the same initials as at least one other customer?
-
+select CONCAT(FirstName, ' ', LastName) as FullName
+FROM Customer
+WHERE FirstName LIKE '%a'
 
 -- Which countries have the most invoices?
-
+SELECT i.BillingCity, COUNT(IL.Quantity) AS 'Invoice Quantity'
+    FROM Invoice as i
+INNER JOIN InvoiceLine as IL ON IL.InvoiceId = I.InvoiceId
+GROUP BY i.BillingCity, IL.Quantity
+ORDER BY IL.Quantity DESC;
 
 -- Which city has the customer with the highest sales total?
-
+SELECT TOP 1 c.Country, I.Total
+    FROM Customer as c
+INNER JOIN Invoice as I ON I.CustomerId = c.CustomerId
+ORDER BY I.Total DESC;
 
 -- Who is the highest spending customer?
-
+SELECT TOP 1 
+    CONCAT(c.FirstName, ' ', c.LastName) AS FullName, I.Total
+    FROM Customer as c
+    INNER JOIN Invoice as I ON I.CustomerId = c.CustomerId
+    INNER JOIN InvoiceLine as IL ON IL.InvoiceId = I.InvoiceId
+ORDER BY IL.UnitPrice * IL.Quantity DESC;
 
 -- Return the email and full name of of all customers who listen to Rock.
-
+SELECT DISTINCT
+    CONCAT(c.FirstName, ' ', c.LastName) as CustomerName, c.Email, g.Name
+    FROM Customer as c 
+    INNER JOIN Invoice as I ON I.CustomerId = c.CustomerId
+    INNER JOIN InvoiceLine as IL ON IL.InvoiceId = I.InvoiceId
+    INNER JOIN Track as t ON t.TrackId = IL.TrackId
+    INNER JOIN Genre as g ON g.GenreId = t.GenreId
+    AND g.Name LIKE '%Rock%'
 
 -- Which artist has written the most Rock songs?
+SELECT 
+    ar.Name, COUNT(t.Name) from Artist as ar----
+    INNER JOIN Album as al ON al.ArtistId = ar.ArtistId
+    INNER JOIN Track as t ON t.TrackId = al.AlbumId
+    INNER JOIN Genre as g ON g.GenreId = t.GenreId
+    AND g.Name LIKE '%Rock%'
+    GROUP BY g.GenreId, ar.Name
+    HAVING g.GenreId = 1---------
 
+   
 
 -- Which artist has generated the most revenue?
 
