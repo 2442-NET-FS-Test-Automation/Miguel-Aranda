@@ -44,11 +44,11 @@ select BillingCountry from Invoice;
 
 -- Retrieve how many invoices there were in 2021, and what was the sales total for that year?
 
-SELECT i.InvoiceDate ,COUNT(*) AS TotalInvoices, i.Total
+SELECT 
+    COUNT(*) AS TotalInvoices, 
+    SUM(i.Total) as SalesTotal
 FROM Invoice AS i
-WHERE invoiceDate LIKE '%2021%'
-GROUP BY i.InvoiceDate, i.Total 
-HAVING COUNT(*) > 0
+WHERE i.invoiceDate >= '2021-01-01' AND i.InvoiceDate < '2022-01-01'
 ORDER BY TotalInvoices DESC;
 -- (challenge: find the invoice count sales total for every year using one query)
 SELECT COUNT(Total) AS CountTotal FROM invoice;
@@ -58,17 +58,15 @@ SELECT COUNT(Total) AS CountTotal FROM invoice;
 SELECT SUM(Quantity) FROM InvoiceLine WHERE InvoiceId = 37;
 
 -- how many invoices per country? BillingCountry  # of invoices 
-SELECT BillingCountry ,COUNT(*) AS NumberInvoices 
+SELECT BillingCountry ,COUNT(*) AS '# of invoices' 
 FROM Invoice
 GROUP BY BillingCountry
-HAVING COUNT(*) > 0
 
 -- Retrieve the total sales per country, ordered by the highest total sales first.
 SELECT BillingCountry ,SUM(Total) AS TotalSales
 FROM Invoice
 GROUP BY BillingCountry
-HAVING COUNT(*) > 0
-ORDER BY MAX(Total) DESC
+ORDER BY TotalSales DESC
 
 
 -- JOINS CHALLENGES
@@ -106,8 +104,8 @@ HAVING Count(*) > 0
 
 -- Show all invoices together with the name of the sales agent for each one
 SELECT i.InvoiceDate, i.BillingAddress, 
-e.FirstName as ClientFirstName, e.LastName as ClientLastName,
-e.Title as Title,
+CONCAT(e.FirstName, ' ', e.LastName) AS 'Agent FullName',
+e.Title as 'Agent Title',
 i.BillingCity FROM Invoice AS i
 INNER JOIN Customer as c
 ON c.CustomerId = i.CustomerId
@@ -115,16 +113,31 @@ INNER JOIN Employee as e
 ON e.EmployeeId = c.SupportRepId
 AND e.Title LIKE '%Sales%'
 
-select * from Employee;
+use Chinook_AutoIncrement;
 
 -- Which sales agent made the most sales in 2021?
-
+SELECT 
+    CONCAT(e.FirstName, ' ', e.LastName) AS 'Agent FullName',
+    e.Title as 'Agent Title',
+    SUM(i.Total) AS TotalSales 
+FROM Invoice AS i
+INNER JOIN Customer as c ON c.CustomerId = i.CustomerId
+INNER JOIN Employee as e ON e.EmployeeId = c.SupportRepId
+AND e.Title LIKE '%Sales%'
+AND i.InvoiceDate >= '2021-01-01' AND i.InvoiceDate < '2022-01-01'
+GROUP BY e.EmployeeId, e.FirstName, e.LastName, e.Title
+ORDER BY TotalSales DESC ;
 
 -- How many customers are assigned to each sales agent?
-
+SELECT COUNT(*) as '# of customers'
+FROM Customer AS c
+INNER JOIN Employee as e ON e.EmployeeId = c.SupportRepId
+AND e.Title LIKE '%SALES%'
+GROUP BY e.EmployeeId;
 
 -- Which track was purchased the most in 2010?
-
+SELECT * FROM Track;
+SELECT * FROM Play
 
 -- Show the top three best selling artists.
 
