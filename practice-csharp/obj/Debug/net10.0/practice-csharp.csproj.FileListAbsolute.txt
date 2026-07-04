@@ -1,0 +1,15 @@
+C:\Users\angie\OneDrive\Documentos\codigo miguel\Miguel-Aranda\practice-csharp\obj\Debug\net10.0\practice-csharp.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\angie\OneDrive\Documentos\codigo miguel\Miguel-Aranda\practice-csharp\obj\Debug\net10.0\practice-csharp.AssemblyInfoInputs.cache
+C:\Users\angie\OneDrive\Documentos\codigo miguel\Miguel-Aranda\practice-csharp\obj\Debug\net10.0\practice-csharp.AssemblyInfo.cs
+C:\Users\angie\OneDrive\Documentos\codigo miguel\Miguel-Aranda\practice-csharp\obj\Debug\net10.0\practice-csharp.csproj.CoreCompileInputs.cache
+C:\Users\angie\OneDrive\Documentos\codigo miguel\Miguel-Aranda\practice-csharp\obj\Debug\net10.0\practice-csharp.sourcelink.json
+C:\Users\angie\OneDrive\Documentos\codigo miguel\Miguel-Aranda\practice-csharp\bin\Debug\net10.0\practice-csharp.exe
+C:\Users\angie\OneDrive\Documentos\codigo miguel\Miguel-Aranda\practice-csharp\bin\Debug\net10.0\practice-csharp.deps.json
+C:\Users\angie\OneDrive\Documentos\codigo miguel\Miguel-Aranda\practice-csharp\bin\Debug\net10.0\practice-csharp.runtimeconfig.json
+C:\Users\angie\OneDrive\Documentos\codigo miguel\Miguel-Aranda\practice-csharp\bin\Debug\net10.0\practice-csharp.dll
+C:\Users\angie\OneDrive\Documentos\codigo miguel\Miguel-Aranda\practice-csharp\bin\Debug\net10.0\practice-csharp.pdb
+C:\Users\angie\OneDrive\Documentos\codigo miguel\Miguel-Aranda\practice-csharp\obj\Debug\net10.0\practice-csharp.dll
+C:\Users\angie\OneDrive\Documentos\codigo miguel\Miguel-Aranda\practice-csharp\obj\Debug\net10.0\refint\practice-csharp.dll
+C:\Users\angie\OneDrive\Documentos\codigo miguel\Miguel-Aranda\practice-csharp\obj\Debug\net10.0\practice-csharp.pdb
+C:\Users\angie\OneDrive\Documentos\codigo miguel\Miguel-Aranda\practice-csharp\obj\Debug\net10.0\practice-csharp.genruntimeconfig.cache
+C:\Users\angie\OneDrive\Documentos\codigo miguel\Miguel-Aranda\practice-csharp\obj\Debug\net10.0\ref\practice-csharp.dll
