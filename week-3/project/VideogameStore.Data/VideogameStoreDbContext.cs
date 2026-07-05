@@ -1,6 +1,6 @@
 ﻿namespace VideogameStore.Data;
 
-public class Class1
+public class VideogameStoreDbContext
 {
 
 }
