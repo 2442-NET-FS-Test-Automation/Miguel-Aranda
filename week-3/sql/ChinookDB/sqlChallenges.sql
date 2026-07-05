@@ -29,13 +29,15 @@ SELECT CONCAT(FirstName, ' ', LastName) AS FullName,
 WHERE c.Country != 'USA';
 
 -- List all customers from Brazil
-SELECT * FROM Customer where Country = 'Brazil';
+SELECT * FROM Customer 
+where Country = 'Brazil';
 -- SELECT * FROM Customer where Country LIKE '%Brazil%';
 
 
 
 -- List all sales agents
-
+SELECT * FROM Employee 
+WHERE Title LIKE '%Agent%';
 -- SELECT * FROM employee WHERE title LIKE '%Agent%;
 
 
@@ -44,43 +46,43 @@ select BillingCountry from Invoice;
 
 -- Retrieve how many invoices there were in 2021, and what was the sales total for that year?
 
-SELECT i.InvoiceDate ,COUNT(*) AS TotalInvoices, i.Total
+SELECT 
+    COUNT(*) AS TotalInvoices, 
+    SUM(i.Total) as SalesTotal
 FROM Invoice AS i
-WHERE invoiceDate LIKE '%2021%'
-GROUP BY i.InvoiceDate, i.Total 
-HAVING COUNT(*) > 0
+WHERE i.invoiceDate >= '2021-01-01' AND i.InvoiceDate < '2022-01-01'
 ORDER BY TotalInvoices DESC;
 -- (challenge: find the invoice count sales total for every year using one query)
 SELECT COUNT(Total) AS CountTotal FROM invoice;
 
 
 -- how many line items were there for invoice #37
-SELECT SUM(Quantity) FROM InvoiceLine WHERE InvoiceId = 37;
+SELECT SUM(Quantity) AS ITEMS 
+FROM InvoiceLine 
+WHERE InvoiceId = 37;
 
 -- how many invoices per country? BillingCountry  # of invoices 
 SELECT BillingCountry ,COUNT(*) AS NumberInvoices 
 FROM Invoice
 GROUP BY BillingCountry
-HAVING COUNT(*) > 0
+Order by NumberInvoices DESC;
 
 -- Retrieve the total sales per country, ordered by the highest total sales first.
 SELECT BillingCountry ,SUM(Total) AS TotalSales
 FROM Invoice
 GROUP BY BillingCountry
-HAVING COUNT(*) > 0
-ORDER BY MAX(Total) DESC
+ORDER BY TotalSales DESC
 
 
 -- JOINS CHALLENGES
 -- Every Album by Artist
 
-SELECT ar.Name AS ArtistName, al.Title AS AlbumTitle 
+SELECT ar.Name AS ArtistName, 
+al.Title AS 'Album Title' 
 FROM Album AS al
 INNER JOIN Artist AS ar
-ON al.ArtistId = al.ArtistId
-GROUP BY al.Title, ar.Name 
-HAVING COUNT(*) > 0;
-
+ON al.ArtistId = ar.ArtistId
+ORDER BY ar.Name;
 
 -- (inner keyword is optional for inner join)
 
@@ -90,8 +92,8 @@ SELECT t.Name AS TrackName, g.Name AS Genre
 FROM Track AS t
 INNER JOIN Genre AS g
 ON t.GenreId = g.GenreId
-GROUP BY g.Name, t.Name
-HAVING COUNT(*) > 0;
+AND g.Name = 'Rock'
+ORDER BY t.Name;
 
 -- Show all invoices of customers from brazil (mailing address not billing)
 SELECT i.InvoiceDate, i.BillingAddress, 
@@ -105,51 +107,120 @@ i.InvoiceDate, i.BillingAddress, c.Country
 HAVING Count(*) > 0
 
 -- Show all invoices together with the name of the sales agent for each one
-SELECT i.InvoiceDate, i.BillingAddress, 
-e.FirstName as ClientFirstName, e.LastName as ClientLastName,
-e.Title as Title,
+SELECT i.InvoiceDate, 
+CONCAT(e.FirstName, ' ', e.LastName) AS 'Agent FullName',
+e.Title as 'Agent Title',
 i.BillingCity FROM Invoice AS i
 INNER JOIN Customer as c
 ON c.CustomerId = i.CustomerId
 INNER JOIN Employee as e
 ON e.EmployeeId = c.SupportRepId
-AND e.Title LIKE '%Sales%'
+AND e.Title LIKE '%Agent%'
 
-select * from Employee;
+use Chinook_AutoIncrement;
 
 -- Which sales agent made the most sales in 2021?
-
+SELECT TOP 1
+    CONCAT(e.FirstName, ' ', e.LastName) AS 'Agent FullName',
+    SUM(i.Total) AS TotalSales 
+FROM Invoice AS i
+INNER JOIN Customer as c ON c.CustomerId = i.CustomerId
+INNER JOIN Employee as e ON e.EmployeeId = c.SupportRepId
+AND e.Title LIKE '%Agent%'
+AND i.InvoiceDate >= '2021-01-01' AND i.InvoiceDate < '2022-01-01'
+GROUP BY e.FirstName, e.LastName
+ORDER BY TotalSales DESC ;
 
 -- How many customers are assigned to each sales agent?
+SELECT COUNT(*) as '# of customers'
+FROM Customer AS c
+INNER JOIN Employee as e ON e.EmployeeId = c.SupportRepId
+AND e.Title LIKE '%Agent%'
+GROUP BY e.EmployeeId;
 
-
--- Which track was purchased the most in 2010?
-
-
+-- Which track was purchased the most in 2021?
+SELECT TOP 1 Name
+FROM Track as t
+INNER JOIN InvoiceLine as IL on IL.TrackId = t.TrackId
+INNER JOIN Invoice as I on I.InvoiceId = IL.InvoiceId
+AND I.InvoiceDate >= '2021-01-01' AND I.InvoiceDate < '2022-01-01'
+ORDER BY I.Total DESC;
 -- Show the top three best selling artists.
+SELECT TOP 3 ar.Name, SUM(IL.UnitPrice * IL.Quantity) AS Sells  
+FROM Artist as ar
+INNER JOIN Album as al on al.ArtistId = ar.ArtistId
+INNER JOIN Track as t on t.AlbumId = al.AlbumId
+INNER JOIN InvoiceLine as IL on Il.TrackId = t.TrackId
+GROUP BY ar.Name
+ORDER BY Sells DESC;
 
+select * from Invoice;
 
 -- Which customers have the same initials as at least one other customer?
+select 
+    CONCAT(c1.FirstName, ' ', c1.LastName) as FullName
+    FROM Customer as c1
+    INNER JOIN Customer as c2
+    ON LEFT(c1.FirstName, 1) = LEFT(c2.FirstName, 1)
+    AND LEFT(c1.LastName, 1) = LEFT(c2.LastName, 1)
+    AND c1.CustomerId != c2.CustomerId
+ORDER BY FullName;
+
 
 
 -- Which countries have the most invoices?
-
+SELECT i.BillingCity, COUNT(IL.Quantity) AS 'Invoice Quantity'
+    FROM Invoice as i
+INNER JOIN InvoiceLine as IL ON IL.InvoiceId = I.InvoiceId
+GROUP BY i.BillingCity, IL.Quantity
+ORDER BY IL.Quantity DESC;
 
 -- Which city has the customer with the highest sales total?
-
+SELECT TOP 1 c.Country, I.Total
+    FROM Customer as c
+INNER JOIN Invoice as I ON I.CustomerId = c.CustomerId
+ORDER BY I.Total DESC;
 
 -- Who is the highest spending customer?
-
+SELECT TOP 1 
+    CONCAT(c.FirstName, ' ', c.LastName) AS FullName, I.Total
+    FROM Customer as c
+    INNER JOIN Invoice as I ON I.CustomerId = c.CustomerId
+    INNER JOIN InvoiceLine as IL ON IL.InvoiceId = I.InvoiceId
+ORDER BY IL.UnitPrice * IL.Quantity DESC;
 
 -- Return the email and full name of of all customers who listen to Rock.
-
+SELECT DISTINCT
+    CONCAT(c.FirstName, ' ', c.LastName) as CustomerName, c.Email
+    FROM Customer as c 
+    INNER JOIN Invoice as I ON I.CustomerId = c.CustomerId
+    INNER JOIN InvoiceLine as IL ON IL.InvoiceId = I.InvoiceId
+    INNER JOIN Track as t ON t.TrackId = IL.TrackId
+    INNER JOIN Genre as g ON g.GenreId = t.GenreId
+    AND g.Name = 'Rock'
 
 -- Which artist has written the most Rock songs?
-
+SELECT TOP 5
+    ar.Name, COUNT(t.Name) AS RockSongs 
+    from Artist as ar
+    INNER JOIN Album as al ON al.ArtistId = ar.ArtistId
+    INNER JOIN Track as t ON t.AlbumId = al.AlbumId
+    INNER JOIN Genre as g ON g.GenreId = t.GenreId
+    AND g.Name = 'Rock'
+    GROUP BY ar.Name
+    ORDER BY RockSongs DESC
 
 -- Which artist has generated the most revenue?
+SELECT TOP 1
+    ar.Name, SUM(IL.UnitPrice * IL.Quantity) AS Revenue 
+    FROM Artist as ar
+    INNER JOIN Album as al ON al.ArtistId = ar.ArtistId
+    INNER JOIN Track as t ON t.AlbumId = al.AlbumId
+    INNER JOIN InvoiceLine as IL On IL.TrackId = t.TrackId
+    GROUP BY ar.Name
+    ORDER BY Revenue DESC
 
-
+select * from InvoiceLine;
 
 
 -- ADVANCED CHALLENGES
