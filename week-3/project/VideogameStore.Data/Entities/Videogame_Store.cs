@@ -5,5 +5,5 @@ public class Videogame_Store
     public int VideogameId {get; set;} // FK
     public Videogame Videogame {get; set;} = default!;
     public int StoreId {get; set;} // FK
-    public Store Store {get; set;}
+    public Store Store {get; set;} = default!;
 }

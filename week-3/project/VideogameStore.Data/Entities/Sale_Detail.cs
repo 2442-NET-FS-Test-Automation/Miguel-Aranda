@@ -5,8 +5,8 @@ public class Sale_Detail
     public int Quantity {get; set;}
     public decimal UnitPrice {get; set;}
     public int VideogameId {get; set;} // FK
-    public Videogame Videogame {get; set;}
+    public Videogame Videogame {get; set;} = default!;
     public int SaleId {get; set;} // FK
-    public Sale Sale {get; set;}
+    public Sale Sale {get; set;} = default!;
 
 }
