@@ -45,9 +45,9 @@ app.MapGet("/inventory", async (VideogameStoreDbContext db) =>
    return await db.Game.ToListAsync();
 });
 
-app.MapGet("/inventory/value", async (VideogameStoreDbContext db) =>
+app.MapGet("/inventory/id", async (VideogameStoreDbContext db) =>
 {
-   return db.Game.Include(i => i.VideogameName)
+   return db.Game.Include(i => i.Gamename)
         .GroupBy(i => i.Stock >= 5 ? "well-stocked" : "low")
         .Select(g => new{tier = g.Key, count=g.Count(), units=g.Sum(i => i.Stock)})
         .ToList();
