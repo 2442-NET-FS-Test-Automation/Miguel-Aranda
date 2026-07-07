@@ -12,4 +12,7 @@ public class Sale
     public Customer Customer {get; set;} = default!;
     public SaleFormat Format {get; set;} // enums: every game could be either in digital format or physical
     public DateTime SaleDate {get; set;} = DateTime.UtcNow;
+    public List<Sale_Detail> SaleDetails {get; set;} = new();
+    public Status Status {get; set;}
+    public Priority Priority {get; set;}
 }

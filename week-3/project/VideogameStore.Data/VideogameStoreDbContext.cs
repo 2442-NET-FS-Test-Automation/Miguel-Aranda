@@ -23,22 +23,30 @@ public class VideogameStoreDbContext : DbContext
             e.Property(p => p.UnitPrice).HasColumnType("decimal(10,2)");
         });
 
-        // b.Entity<Store>(e =>
-        // {
-        //    e.HasOne(em => em.Employee)
-        //         .WithOne()
-        //         .HasForeignKey(em => em.EmployeeId);
-        // });
+        b.Entity<Store>(e =>
+        {
+                e.HasOne(s => s.Employee)
+                    .WithOne()
+                    .HasForeignKey<Store>(s => s.EmployeeId);
+        });
+
+        b.Entity<Sale>(e =>
+        {
+                e.HasOne(s => s.Store)
+                    .WithMany()
+                    .HasForeignKey(s => s.StoreId)
+                    .OnDelete(DeleteBehavior.Restrict); // restriction similar to on delete cascade
+
+                e.HasOne(s => s.Employee)
+                    .WithMany()
+                    .HasForeignKey(s => s.EmployeeId)
+                    .OnDelete(DeleteBehavior.Restrict); // restriction similar to on delete cascade
+        });
 
         b.Entity<Videogame_Store>(e =>
         {
-           e.HasOne(vs => vs.Videogame) 
-                .WithMany() // empty since we don't have a list named Videogame_Store
-                .HasForeignKey(vs => vs.VideogameId);
-
-            e.HasOne(vs => vs.Store)
-                .WithMany()
-                .HasForeignKey(vs => vs.StoreId);
+                e.HasOne(vs => vs.Videogame).WithMany().HasForeignKey(vs => vs.VideogameId).OnDelete(DeleteBehavior.Restrict);
+                e.HasOne(vs => vs.Store).WithMany().HasForeignKey(vs => vs.StoreId).OnDelete(DeleteBehavior.Restrict);
         });
 
         // setting row version to EF Core RowVersion

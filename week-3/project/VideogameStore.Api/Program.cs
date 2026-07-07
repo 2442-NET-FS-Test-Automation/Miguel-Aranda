@@ -2,13 +2,14 @@ using Microsoft.EntityFrameworkCore;
 using VideogameStore.Data;
 using VideogameStore.Data.Entities;
 using Serilog;
+using VideogameStore.Api.Fullfill;
 
 
 // initializing the builder
 var builder = WebApplication.CreateBuilder(args);
 
 // connection string
-var conn_string = "Server=localhost;Database=LibraryMinimalDb;User Id=sa;Password=libraryPass1!;TrustServerCertificate=true;";
+var conn_string = "Server=localhost;Database=VideogameStoreDb;User Id=sa;Password=libraryPass1!;TrustServerCertificate=true;";
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
@@ -24,7 +25,8 @@ builder.Services.AddDbContext<VideogameStoreDbContext>(options => options.UseSql
 builder.Services.AddDbContextFactory<VideogameStoreDbContext>(options => options.UseSqlServer(conn_string));
 
 // add custom service to builder
-// builder.Services.AddScoped<ISomething, Something>()
+builder.Services.AddScoped<IFullfillService, FulfillService>();
+builder.Services.AddScoped<BurstPlanner>();
 
 // adding Swagger to builder B)
 builder.Services.AddEndpointsApiExplorer();

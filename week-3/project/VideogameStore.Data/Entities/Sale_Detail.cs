@@ -8,5 +8,4 @@ public class Sale_Detail
     public Videogame Videogame {get; set;} = default!;
     public int SaleId {get; set;} // FK
     public Sale Sale {get; set;} = default!;
-
 }
