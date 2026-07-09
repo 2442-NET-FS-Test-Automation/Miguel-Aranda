@@ -4,9 +4,8 @@ namespace VideogameStore.Data.Entities;
 public class Videogame
 {
     public int VideogameId {get; set;}
-    [Required, MaxLength(50)]
-    public string Genre {get; set;}
+    public string Gamename {get; set;} = default!;
+    public string Genre {get; set;} = default!;
     [MaxLength(20)]
-    public string Clasification {get; set;}
-    public int Stock {get; set;}
+    public Rating Rating {get; set;}
 }
