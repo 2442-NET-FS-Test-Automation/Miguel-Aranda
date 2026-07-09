@@ -8,6 +8,4 @@ public class Videogame
     public string Genre {get; set;} = default!;
     [MaxLength(20)]
     public Rating Rating {get; set;}
-    public int Stock {get; set;}
-    public byte[] RowVersion {get; set;} = default!; 
 }

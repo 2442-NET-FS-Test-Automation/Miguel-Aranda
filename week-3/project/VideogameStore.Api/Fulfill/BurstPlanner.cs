@@ -7,13 +7,17 @@ public class BurstPlanner
     // Method to play fulfillment order
     public IReadOnlyList<int> OrderByPriority(IEnumerable<Sale> sales)
     {
-        PriorityQueue<int, int> pq = new PriorityQueue<int, int>();
+        // we use a tuple (int, DateTime) as queue priority
+        var pq = new PriorityQueue<int, (int PriorityOrder, DateTime SaleDate)>();
         
         foreach(Sale s in sales)
         {
-            // Enqueue each order, if it's Priority is expedited, give it a 0 value, if normal give it 1.
-            pq.Enqueue(s.SaleId, s.Priority == Priority.Expedited ? 0 : 1);
+            int priorityScore = s.Priority == Priority.Expedited ? 0 : 1;
+            // the queue will order first by 0 (0 before 1)
+            // if are equal, order them by the oldest SaleDate (First In, First Out)
+            pq.Enqueue(s.SaleId, (priorityScore, s.SaleDate));
         }
+        
         var orderedByPriority = new List<int>();
 
         // While our PriorityQueue has stuff in it - loop and add those things in the order they exit

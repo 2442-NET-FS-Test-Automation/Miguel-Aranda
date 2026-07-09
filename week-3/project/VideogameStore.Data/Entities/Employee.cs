@@ -7,4 +7,6 @@ public class Employee
     public string SurName {get; set;} = default!;
     public string Email {get; set;} = default!;
     public string Address {get; set;} = default!;
+    public int StoreId {get; set;}
+    public Store store {get; set;} = default!;
 }

@@ -37,7 +37,7 @@ public class FulfillService : IFullfillService
 
         foreach(Sale_Detail detail in sale.SaleDetails)
         {
-            Videogame videogame = await db.Game
+            Videogame_Store videogame = await db.GameStore
                 .FirstAsync(v => v.VideogameId == detail.VideogameId);
 
             if(videogame.Stock < detail.Quantity)
@@ -100,18 +100,18 @@ public class FulfillService : IFullfillService
                     // EF Core: I know what changed, now compare me with that new data
                     entry.OriginalValues.SetValues(CurrentDatabaseValues);
 
-                    if(entry.Entity is Videogame videogame)
+                    if(entry.Entity is Videogame_Store vStore)
                     {
                         // we obtain the stock recently gotten from the db
-                        int freshStock = CurrentDatabaseValues.GetValue<int>(nameof(Videogame.Stock));
+                        int freshStock = CurrentDatabaseValues.GetValue<int>(nameof(Videogame_Store.Stock));
                         
                         // we look for how many units the user would like to buy
-                        int desiredAmount = requestedByGameId[videogame.VideogameId];
+                        int desiredAmount = requestedByGameId[vStore.VideogameId];
                         
                         // EXIT CONDITION: If the stock in db is out of reach to buy, it fails.
                         if(freshStock < desiredAmount) return false;
                         
-                        videogame.Stock = freshStock - desiredAmount;
+                        vStore.Stock = freshStock - desiredAmount;
                     }
                 }
             }

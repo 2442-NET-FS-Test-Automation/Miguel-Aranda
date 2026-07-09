@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VideogameStore.Data;
 
@@ -11,9 +12,11 @@ using VideogameStore.Data;
 namespace VideogameStore.Data.Migrations
 {
     [DbContext(typeof(VideogameStoreDbContext))]
-    partial class VideogameStoreDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260707211138_NewStockChanges")]
+    partial class NewStockChanges
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -79,16 +82,11 @@ namespace VideogameStore.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("StoreId")
-                        .HasColumnType("int");
-
                     b.Property<string>("SurName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("EmployeeId");
-
-                    b.HasIndex("StoreId");
 
                     b.ToTable("Employees");
 
@@ -99,7 +97,6 @@ namespace VideogameStore.Data.Migrations
                             Address = "Harmond street 134",
                             Email = "Juan@example.com",
                             Name = "Juan",
-                            StoreId = 1,
                             SurName = "Lopez"
                         },
                         new
@@ -108,7 +105,6 @@ namespace VideogameStore.Data.Migrations
                             Address = "Julieth street 3",
                             Email = "Mario@example.com",
                             Name = "Mario",
-                            StoreId = 2,
                             SurName = "Rosa"
                         });
                 });
@@ -216,11 +212,17 @@ namespace VideogameStore.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("EmployeeId")
+                        .HasColumnType("int");
+
                     b.Property<string>("StoreName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("StoreId");
+
+                    b.HasIndex("EmployeeId")
+                        .IsUnique();
 
                     b.ToTable("Stores");
 
@@ -229,12 +231,14 @@ namespace VideogameStore.Data.Migrations
                         {
                             StoreId = 1,
                             Address = "James Bond street 77",
+                            EmployeeId = 1,
                             StoreName = "Gamestop"
                         },
                         new
                         {
                             StoreId = 2,
                             Address = "Abraham's lincon street 44",
+                            EmployeeId = 2,
                             StoreName = "Gamestop 2"
                         });
                 });
@@ -335,21 +339,10 @@ namespace VideogameStore.Data.Migrations
                         });
                 });
 
-            modelBuilder.Entity("VideogameStore.Data.Entities.Employee", b =>
-                {
-                    b.HasOne("VideogameStore.Data.Entities.Store", "store")
-                        .WithMany("Employees")
-                        .HasForeignKey("StoreId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("store");
-                });
-
             modelBuilder.Entity("VideogameStore.Data.Entities.Sale", b =>
                 {
                     b.HasOne("VideogameStore.Data.Entities.Customer", "Customer")
-                        .WithMany("Sales")
+                        .WithMany()
                         .HasForeignKey("CustomerId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -400,6 +393,17 @@ namespace VideogameStore.Data.Migrations
                     b.Navigation("Videogame");
                 });
 
+            modelBuilder.Entity("VideogameStore.Data.Entities.Store", b =>
+                {
+                    b.HasOne("VideogameStore.Data.Entities.Employee", "Employee")
+                        .WithOne()
+                        .HasForeignKey("VideogameStore.Data.Entities.Store", "EmployeeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Employee");
+                });
+
             modelBuilder.Entity("VideogameStore.Data.Entities.Videogame_Store", b =>
                 {
                     b.HasOne("VideogameStore.Data.Entities.Store", "Store")
@@ -419,19 +423,9 @@ namespace VideogameStore.Data.Migrations
                     b.Navigation("Videogame");
                 });
 
-            modelBuilder.Entity("VideogameStore.Data.Entities.Customer", b =>
-                {
-                    b.Navigation("Sales");
-                });
-
             modelBuilder.Entity("VideogameStore.Data.Entities.Sale", b =>
                 {
                     b.Navigation("SaleDetails");
-                });
-
-            modelBuilder.Entity("VideogameStore.Data.Entities.Store", b =>
-                {
-                    b.Navigation("Employees");
                 });
 #pragma warning restore 612, 618
         }

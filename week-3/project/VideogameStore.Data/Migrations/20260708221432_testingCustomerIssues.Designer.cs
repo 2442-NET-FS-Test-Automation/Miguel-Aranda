@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VideogameStore.Data;
 
@@ -11,9 +12,11 @@ using VideogameStore.Data;
 namespace VideogameStore.Data.Migrations
 {
     [DbContext(typeof(VideogameStoreDbContext))]
-    partial class VideogameStoreDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260708221432_testingCustomerIssues")]
+    partial class testingCustomerIssues
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

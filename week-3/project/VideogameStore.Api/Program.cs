@@ -3,6 +3,7 @@ using VideogameStore.Data;
 using VideogameStore.Data.Entities;
 using Serilog;
 using VideogameStore.Api.Fullfill;
+using System.Runtime.Intrinsics.X86;
 
 
 // initializing the builder
@@ -39,22 +40,90 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 // Endpoint area
-app.MapGet("/", () => "Hello World!");
+app.MapGet("/", () => "nothing xd");
 
 // get all items (videogames)
-app.MapGet("/inventory", async (VideogameStoreDbContext db) =>
+app.MapGet("/allgames", async (VideogameStoreDbContext db) =>
 {
    return await db.Game.ToListAsync();
 });
 
-app.MapGet("/inventory/id", async (VideogameStoreDbContext db) =>
+// GET ALL EMPLOYEES FROM EACH STORE
+app.MapGet("/employees-per-store/", async (string? search, VideogameStoreDbContext db) =>
 {
-   return db.Game.Include(i => i.Gamename)
-        .GroupBy(i => i.Stock >= 5 ? "well-stocked" : "low")
-        .Select(g => new{tier = g.Key, count=g.Count(), units=g.Sum(i => i.Stock)})
-        .ToList();
+    var query = db.Stores
+        .SelectMany(s => s.Employees);
+
+    if (!string.IsNullOrEmpty(search))
+        query = query.Where(e => e.Name.ToLower().Contains(search.ToLower()));
+    
+
+    return await query
+        .Select(e => new
+        {
+            e.EmployeeId,
+            e.Name,
+            e.Address,
+            e.Email,
+            e.StoreId
+        })
+        .ToListAsync();
 });
 
+// get all customer sales
+// if there aren't any sales it will always show null. We need sales first to see something
+app.MapGet("/customer-Sales/", async (string? search, VideogameStoreDbContext db) =>
+{
+    // I want a query for the Sales table but don't go to the database yet. Wait until I provide you any filters
+    var query = db.Sales.AsQueryable(); // go directly into the Sales table
+    // AsQueryable() method converts an IEnumerable collection into an IQueryable interface.
+    
 
+    if (!string.IsNullOrEmpty(search)) // filter user navigation
+    {
+        query = query.Where(s => s.Customer.Name.ToLower().Contains(search.ToLower()));
+    }
 
-app.Run();
+    return await query
+        .Select(s => new
+        {
+            s.SaleId,
+            s.StoreId,
+            s.EmployeeId,
+            s.PaymentMethodId,
+            CustomerName = s.Customer.Name,
+            s.CustomerId,
+            s.Format,
+            s.SaleDate,
+            s.Status,
+            s.Priority
+        })
+        .ToListAsync(); // finally the query gets executed into an only efficient SQL command
+});
+
+// method to fulfill one videogame Sale
+app.MapPost("/Customer-Sale-Order", async ( GameSalePaylod SaleRequest, 
+IDbContextFactory<VideogameStoreDbContext> factory, CancellationToken ct, IFullfillService fSvc) =>
+{
+    await using var db = await factory.CreateDbContextAsync(ct);
+
+    var NewGameSale = new Sale
+    {
+        CustomerId = SaleRequest.CustomerId,
+        Priority = Priority.Normal,
+        SaleDetails = {new Sale_Detail {Quantity = SaleRequest.Quantity,}}
+    }; //Sale_DetailId and SaleId are generated automatically so it's now necessary to assign them here
+
+    db.Sales.Add(NewGameSale);
+
+    await db.SaveChangesAsync(ct);
+
+    // lets try to fulfill it
+    FulfillResult result = await fSvc.FulfillOneAsync(NewGameSale.SaleId, ct); // creating new game sale (once created it sets it SaleId)
+    return Results.Ok(new {SaleId = NewGameSale.SaleId, result = result.ToString()});
+});
+
+app.Run(); 
+Log.CloseAndFlush(); // ensures that all batched or buffered log events are written to their final destinations
+public record GameSalePaylod(int CustomerId, int Quantity, decimal UnitPrice, int VideogameId);
+

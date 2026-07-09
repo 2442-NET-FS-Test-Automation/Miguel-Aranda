@@ -25,9 +25,8 @@ public class VideogameStoreDbContext : DbContext
 
         b.Entity<Store>(e =>
         {
-                e.HasOne(s => s.Employee)
-                    .WithOne()
-                    .HasForeignKey<Store>(s => s.EmployeeId);
+                e.HasMany(s => s.Employees)
+                    .WithOne(e => e.store);
         });
 
         b.Entity<Sale>(e =>
@@ -50,27 +49,27 @@ public class VideogameStoreDbContext : DbContext
         });
 
         // setting row version to EF Core RowVersion
-        b.Entity<Videogame>().Property(i => i.RowVersion).IsRowVersion();
+        b.Entity<Videogame_Store>().Property(i => i.RowVersion).IsRowVersion();
         b.Entity<Customer>().Property(c => c.Email).HasMaxLength(256);
         b.Entity<Customer>().HasIndex(c => c.Email).IsUnique();
 
         b.Entity<Employee>().HasData(
-            new Employee { EmployeeId = 1, Name = "Juan", SurName = "Lopez", Address = "Harmond street 134", Email="Juan@example.com"},
-            new Employee { EmployeeId = 2, Name = "Mario", SurName = "Rosa", Address = "Julieth street 3", Email="Mario@example.com"}
+            new Employee { EmployeeId = 1, Name = "Juan", SurName = "Lopez", Address = "Harmond street 134", Email="Juan@example.com", StoreId=1},
+            new Employee { EmployeeId = 2, Name = "Mario", SurName = "Rosa", Address = "Julieth street 3", Email="Mario@example.com", StoreId=2}
         );
 
         b.Entity<Videogame>().HasData(
             new Videogame { VideogameId = 1, Gamename = "Super Smash Bros Ultimate", 
-            Genre = "Fighting", Rating = Rating.Everyone, Stock = 10},
+            Genre = "Fighting", Rating = Rating.Everyone},
             new Videogame { VideogameId = 2, Gamename = "The Legend Of Zelda Ocarina Of Time", 
-            Genre = "Adventure", Rating = Rating.Teen, Stock = 6},
+            Genre = "Adventure", Rating = Rating.Teen},
             new Videogame { VideogameId = 3, Gamename = "Hollow Knight: Silksong", 
-            Genre = "2D Platformer", Rating = Rating.Teen, Stock = 5}
+            Genre = "2D Platformer", Rating = Rating.Teen}
         );
 
         b.Entity<Store>().HasData(
-            new Store { StoreId = 1, StoreName = "Gamestop", Address="James Bond street 77", EmployeeId = 1}, 
-            new Store { StoreId = 2, StoreName = "Gamestop 2", Address="Abraham's lincon street 44", EmployeeId = 2}
+            new Store { StoreId = 1, StoreName = "Gamestop", Address="James Bond street 77",}, 
+            new Store { StoreId = 2, StoreName = "Gamestop 2", Address="Abraham's lincon street 44"}
         );   
 
         b.Entity<Videogame_Store>().HasData(
