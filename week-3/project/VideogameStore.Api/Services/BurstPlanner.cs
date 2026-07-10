@@ -1,6 +1,6 @@
 using VideogameStore.Data.Entities;
 
-namespace VideogameStore.Api.Fullfill;
+namespace VideogameStore.Api.Services;
 
 public class BurstPlanner
 {

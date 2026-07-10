@@ -2,11 +2,13 @@ using Microsoft.EntityFrameworkCore;
 using VideogameStore.Data;
 using VideogameStore.Data.Entities;
 using Serilog;
-namespace VideogameStore.Api.Fullfill;
+using System.Collections.Concurrent;
+namespace VideogameStore.Api.Services;
 public interface IFullfillService
 {
     public Task<FulfillResult> FulfillOneAsync(int saleid, CancellationToken ct);
     public Task<BurstResult> FulfillBurstAsync(IEnumerable<int> saleids, CancellationToken ct);
+    public int ResolveCustomerId(string email);
 
 }
 public enum FulfillResult {Fulfilled, Backordered}
@@ -15,12 +17,27 @@ public class FulfillService : IFullfillService
 {
     private readonly IDbContextFactory<VideogameStoreDbContext> _factory;
     private readonly BurstPlanner _planner;
+    private readonly ConcurrentDictionary<string, int> _customerIdByEmail;
 
     public FulfillService(IDbContextFactory<VideogameStoreDbContext> factory, BurstPlanner planner)
     {
         _factory = factory;
         _planner = planner;
+        // its build one time to run the service (scoped)
+        using var db = _factory.CreateDbContext();
+        _customerIdByEmail = new ConcurrentDictionary<string, int>(
+            db.Customers.ToDictionary(c => c.Email, c => c.CustomerId)
+        );
     } 
+
+    // Lookup O(1) (db.Customers.First(c => c.Email == email))
+    public int ResolveCustomerId(string email)
+    {
+        if (_customerIdByEmail.TryGetValue(email, out int id))
+            return id;
+
+        throw new CustomerNotFoundException(email);
+    }
 
     public async Task<FulfillResult> FulfillOneAsync(int saleid, CancellationToken ct)
     {
@@ -37,9 +54,17 @@ public class FulfillService : IFullfillService
 
         foreach(Sale_Detail detail in sale.SaleDetails)
         {
-            Videogame_Store videogame = await db.GameStore
+            Videogame_Store? videogame = await db.GameStore
                 .FirstAsync(v => v.VideogameId == detail.VideogameId);
 
+            if (videogame is null)
+            {
+                canFullfill = false;
+                Log.Error("Sale {saleid} references VideogameId {VideogameId} with no store stock record", 
+                    saleid, detail.VideogameId);
+                break;
+            }
+            
             if(videogame.Stock < detail.Quantity)
             {
                 canFullfill = false;
