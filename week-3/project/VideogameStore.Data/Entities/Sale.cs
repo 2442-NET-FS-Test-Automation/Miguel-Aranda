@@ -15,4 +15,6 @@ public class Sale
     public List<Sale_Detail> SaleDetails {get; set;} = new();
     public Status Status {get; set;}
     public Priority Priority {get; set;}
+    public Promotion Promotion {get; set;} = default!;
+    public int? PromotionId {get; set;}
 }

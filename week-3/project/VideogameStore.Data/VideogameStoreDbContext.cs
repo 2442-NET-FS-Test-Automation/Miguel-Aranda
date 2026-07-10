@@ -15,9 +15,19 @@ public class VideogameStoreDbContext : DbContext
     public DbSet<Store> Stores => Set<Store>();
     public DbSet<Videogame_Store> GameStore => Set<Videogame_Store>();
     public DbSet<Videogame> Game => Set<Videogame>();
+    public DbSet<Promotion> Promotions => Set<Promotion>();
+    public DbSet<Customer_Promotion> C_Promotions => Set<Customer_Promotion>();
 
     protected override void OnModelCreating(ModelBuilder b)
     {
+        // Done to remove a warning from EF Core
+        // SQL needs to know the precision of the decimal
+        // and also the scale of it (how many digits after the decimal point)
+        b.Entity<Promotion>(e => 
+        {
+            e.Property(p => p.Percentage).HasPrecision(18, 2);
+        });
+
         b.Entity<Sale_Detail>(e =>
         {
             e.Property(p => p.UnitPrice).HasColumnType("decimal(10,2)");
@@ -53,6 +63,11 @@ public class VideogameStoreDbContext : DbContext
         b.Entity<Customer>().Property(c => c.Email).HasMaxLength(256);
         b.Entity<Customer>().HasIndex(c => c.Email).IsUnique();
 
+        b.Entity<Customer>().HasData(
+            new Customer { CustomerId = 1, Name = "Jorge", SurName = "Bustamante", Address = "El viejo jenkins", Email="Jorge@example.com", Country="Mexico"},
+            new Customer { CustomerId = 2, Name = "Martha", SurName = "Gonzales", Address = "Halmart street 3", Email="Martha@example.com", Country="USA"}
+        );
+
         b.Entity<Employee>().HasData(
             new Employee { EmployeeId = 1, Name = "Juan", SurName = "Lopez", Address = "Harmond street 134", Email="Juan@example.com", StoreId=1},
             new Employee { EmployeeId = 2, Name = "Mario", SurName = "Rosa", Address = "Julieth street 3", Email="Mario@example.com", StoreId=2}
@@ -73,9 +88,15 @@ public class VideogameStoreDbContext : DbContext
         );   
 
         b.Entity<Videogame_Store>().HasData(
-            new Videogame_Store {Videogame_StoreId = 1, StoreId = 1, VideogameId = 1 },
-            new Videogame_Store {Videogame_StoreId = 2, StoreId =2, VideogameId = 2 }
+            new Videogame_Store {Videogame_StoreId = 1, StoreId = 1, VideogameId = 1, Stock=200 },
+            new Videogame_Store {Videogame_StoreId = 2, StoreId =2, VideogameId = 2, Stock=120}, 
+            new Videogame_Store {Videogame_StoreId = 3, StoreId =2, VideogameId = 3, Stock=40 }
         );
 
+        b.Entity<PaymentMethod>().HasData(
+            new PaymentMethod {PaymentMethodId = 1, MethodName = "Credit Card"},
+            new PaymentMethod {PaymentMethodId = 2, MethodName = "Debit Card"},
+            new PaymentMethod {PaymentMethodId = 3, MethodName = "Cash"}
+        );
     }
 }

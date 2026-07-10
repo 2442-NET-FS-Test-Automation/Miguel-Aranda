@@ -8,6 +8,6 @@ public class Customer
     [Required]
     public string Email {get; set;} = default!;
     public string Address {get; set;} = default!;
-    public string City {get; set;} = default!;
+    public string Country {get; set;} = default!;
     public ICollection<Sale> Sales {get;} = new List<Sale>(); // N:1 ONE TO MANY RELATIONSHIP
 }

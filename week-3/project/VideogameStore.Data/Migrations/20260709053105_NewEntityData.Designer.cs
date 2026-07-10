@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using VideogameStore.Data;
 
@@ -11,9 +12,11 @@ using VideogameStore.Data;
 namespace VideogameStore.Data.Migrations
 {
     [DbContext(typeof(VideogameStoreDbContext))]
-    partial class VideogameStoreDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260709053105_NewEntityData")]
+    partial class NewEntityData
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -77,32 +80,6 @@ namespace VideogameStore.Data.Migrations
                             Name = "Martha",
                             SurName = "Gonzales"
                         });
-                });
-
-            modelBuilder.Entity("VideogameStore.Data.Entities.Customer_Promotion", b =>
-                {
-                    b.Property<int>("Customer_PromotionId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Customer_PromotionId"));
-
-                    b.Property<DateTime>("AlreadyUsed")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("CustomerId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("PromotionId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Customer_PromotionId");
-
-                    b.HasIndex("CustomerId");
-
-                    b.HasIndex("PromotionId");
-
-                    b.ToTable("C_Promotions");
                 });
 
             modelBuilder.Entity("VideogameStore.Data.Entities.Employee", b =>
@@ -193,33 +170,6 @@ namespace VideogameStore.Data.Migrations
                         });
                 });
 
-            modelBuilder.Entity("VideogameStore.Data.Entities.Promotion", b =>
-                {
-                    b.Property<int>("PromotionId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PromotionId"));
-
-                    b.Property<DateTime>("ExpirationDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsValid")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal>("Percentage")
-                        .HasPrecision(18, 2)
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("PromoCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("PromotionId");
-
-                    b.ToTable("Promotions");
-                });
-
             modelBuilder.Entity("VideogameStore.Data.Entities.Sale", b =>
                 {
                     b.Property<int>("SaleId")
@@ -243,9 +193,6 @@ namespace VideogameStore.Data.Migrations
                     b.Property<int>("Priority")
                         .HasColumnType("int");
 
-                    b.Property<int?>("PromotionId")
-                        .HasColumnType("int");
-
                     b.Property<DateTime>("SaleDate")
                         .HasColumnType("datetime2");
 
@@ -262,8 +209,6 @@ namespace VideogameStore.Data.Migrations
                     b.HasIndex("EmployeeId");
 
                     b.HasIndex("PaymentMethodId");
-
-                    b.HasIndex("PromotionId");
 
                     b.HasIndex("StoreId");
 
@@ -430,25 +375,6 @@ namespace VideogameStore.Data.Migrations
                         });
                 });
 
-            modelBuilder.Entity("VideogameStore.Data.Entities.Customer_Promotion", b =>
-                {
-                    b.HasOne("VideogameStore.Data.Entities.Customer", "Customer")
-                        .WithMany()
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("VideogameStore.Data.Entities.Promotion", "Promotion")
-                        .WithMany()
-                        .HasForeignKey("PromotionId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Customer");
-
-                    b.Navigation("Promotion");
-                });
-
             modelBuilder.Entity("VideogameStore.Data.Entities.Employee", b =>
                 {
                     b.HasOne("VideogameStore.Data.Entities.Store", "store")
@@ -480,10 +406,6 @@ namespace VideogameStore.Data.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("VideogameStore.Data.Entities.Promotion", "Promotion")
-                        .WithMany()
-                        .HasForeignKey("PromotionId");
-
                     b.HasOne("VideogameStore.Data.Entities.Store", "Store")
                         .WithMany()
                         .HasForeignKey("StoreId")
@@ -495,8 +417,6 @@ namespace VideogameStore.Data.Migrations
                     b.Navigation("Employee");
 
                     b.Navigation("PaymentMethod");
-
-                    b.Navigation("Promotion");
 
                     b.Navigation("Store");
                 });
