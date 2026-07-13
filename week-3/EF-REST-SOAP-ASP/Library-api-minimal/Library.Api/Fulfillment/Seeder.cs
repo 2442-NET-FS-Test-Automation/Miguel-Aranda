@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 public interface ISeeder
 {
     IReadOnlyList<int> SeedOrders(int n, bool expedited);
+    IReadOnlyList<int> ResetAndCreateOrders(int n);
 }
 
 public class Seeder : ISeeder
@@ -44,6 +45,49 @@ public class Seeder : ISeeder
             db.Orders.Add(order); // Add - state changes in EF CORE change tracker
             db.SaveChanges(); // persists changes
             ids.Add(order.Id); // add the created order's ID to the id list
+        }
+        return ids;
+    }
+
+    public IReadOnlyList<int> ResetAndCreateOrders (int n)
+    {
+        using var db = _factory.CreateDbContext();
+
+        foreach(InventoryItem inv in db.Inventory)
+        {
+            switch (inv.ProductId)
+            {
+                case 1: 
+                    inv.CurrentStock = 5;
+                    break;
+                case 2:
+                    inv.CurrentStock = 3;
+                    break;
+                case 3:
+                    inv.CurrentStock = 8;
+                    break;
+                default:
+                    break;
+            }
+        }
+        db.SaveChanges(); // saving changes after reset
+
+        var pid = db.Products.ToDictionary(p => p.Sku, p => p.Id);
+
+        // n is user defined - how many orders in total do we want to make
+        var ids = new List<int>(n);
+
+        for (var i = 0; i < n; i++)
+        {
+            var order = new Order
+            {
+                CustomerId = Random.Shared.Next(1, 3),
+                Priority = i % 3 == 0 ? Priority.Expedited : Priority.Normal,
+                Lines = {new OrderLine { ProductId = pid [new [] { "BK-001", "BK-002", "BK-003"}[i % 3]], Quantity = 1}}
+            };
+            db.Orders.Add(order);
+            db.SaveChanges();
+            ids.Add(order.Id);
         }
         return ids;
     }

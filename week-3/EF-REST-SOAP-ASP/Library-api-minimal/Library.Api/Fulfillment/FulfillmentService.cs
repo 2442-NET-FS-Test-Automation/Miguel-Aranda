@@ -2,6 +2,7 @@ using Library.Data;
 using Library.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using System.Collections.Concurrent;
 
 namespace Library.Api.Fulfillment;
 
@@ -11,6 +12,7 @@ public interface IFulfillmentService
 {
     public Task<FulfillmentResult> FulfillOneAsync(int orderId, CancellationToken ct);
     public Task<BurstResult> FulfillBurstAsync(IEnumerable<int> orderIds, CancellationToken ct);
+    public int ResolveProductId(string sku);
     
 }
 // Im going to stick everything about order fulfillment in this file
@@ -25,12 +27,28 @@ public class FulfillmentService : IFulfillmentService
     // If we need a DbContext or DbContextFactory or Logger or any other dependency
     // we DO NOT instantiate one here, we ask for one via the constructor
     private readonly IDbContextFactory<LibraryDbContext> _factory; // holds my factory
+    private readonly BurstPlanner _planner;
+    private readonly ConcurrentDictionary<string, int> _SkuToProductId;
 
     // factory in the constructor arguments list comes from the ASP.NET container
-    public FulfillmentService(IDbContextFactory<LibraryDbContext> factory)
+    public FulfillmentService(IDbContextFactory<LibraryDbContext> factory, BurstPlanner planner)
     {
         _factory = factory;
+        _planner = planner;
+
+        // Storing skus and their product Id's so we can do O(1) lookup if we need it later
+        using var db = _factory.CreateDbContext();
+        _SkuToProductId = new ConcurrentDictionary<string, int>(
+            db.Products.ToDictionary(p => p.Sku, p => p.Id)
+        );
     }
+
+    // Method to resolve skus to productId using that dictionary
+    public int ResolveProductId(string sku)
+    {
+      try { return _SkuToProductId[sku];  }
+      catch( KeyNotFoundException){ throw new UnknownSkuException(sku);}
+    } 
 
     // the method is going to handle fulfillment - its gonna be a bit long. Which is why we didn't 
     // just write all of this Program.cs
@@ -124,6 +142,7 @@ public class FulfillmentService : IFulfillmentService
             // was called 
             catch (DbUpdateConcurrencyException ex)
             {
+                Log.Warning("Attempting retry");
                 // Retry logic - remember that Change Tracker stuff?
                 // entry is an EF Core Tracker entry
                 foreach ( var entry in ex.Entries)
@@ -155,6 +174,21 @@ public class FulfillmentService : IFulfillmentService
 
     public async Task<BurstResult> FulfillBurstAsync(IEnumerable<int> orderIds, CancellationToken ct)
     {
+        // grabbing all my orderIds
+        List<int> idList = orderIds.ToList();
+
+        List<Order> orders;
+
+        // Calling on a dbcontext that we discard after we're done
+        await using (var db = await _factory.CreateDbContextAsync(ct))
+        {
+            orders = await db.Orders.Where(o => idList.Contains(o.Id)).ToListAsync();
+        }
+
+        // Calling on our planning logic inside BurstPlanner
+        // planned contains our expedited/priority first order
+        var planed = _planner.OrderByPriority(orders);
+
         // we are just going to piggyback off of FulfillOneAsync - no need to rewerite logic we can just call it again
         var tasks = orderIds.Select(id => FulfillOneAsync(id, ct)); // each call will get its own dbContext
 
